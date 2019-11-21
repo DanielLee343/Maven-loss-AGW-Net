@@ -10,5 +10,4 @@ Please create 3 folders before training: `orig_gt`, `resized_train`, `resized_gt
 ### Citation 
 
 This work is based on the work blow:
-
-
+https://github.com/nabsabraham/focal-tversky-unet
