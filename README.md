@@ -6,6 +6,8 @@ We introduce (1) a novel loss function named ‘Maven Loss’ by taking ‘speci
 
 ### Training
 Please create 3 folders before training: `orig_gt`, `resized_train`, `resized_gt`, for full resolution ground truth images, resized images of training set and resized images of ground truth, respectively. The resized resolution is 192*256.
+run 'python isic_train.py'
+*Note that my configuration is tensorflow-gpu = 1.13.1, keras = 2.3.1, cuda = 10.1
 
 ### Citation 
 
