@@ -5,8 +5,8 @@ import tensorflow as tf
 epsilon = 1e-5
 smooth = 1
 alpha = 0.7
-w1 = 0.7125
-w2 = 0.0375
+w1 = 0.75
+w2 = 0
 w3 = 0.25      
 
 def dsc(y_true, y_pred):

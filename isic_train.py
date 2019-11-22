@@ -51,7 +51,6 @@ sgd = SGD(lr=0.01, momentum=0.90, decay=1e-6)
 #adam = Adam(lr=1e-3) 
 adam = Adam(lr=0.001, beta_1=0.9, beta_2=0.999, epsilon=1e-08)
 
-#设立文件目录
 curr_dir = os.getcwd()
 train_dir = os.path.join(curr_dir, 'resized_train')
 gt_dir = os.path.join(curr_dir, 'resized_gt')
@@ -60,11 +59,9 @@ orig_dir = os.path.join(curr_dir, 'orig_gt')
 img_list = os.listdir(train_dir)
 num_imgs = len(img_list)
 
-#初始化data
 orig_data = np.zeros((num_imgs, img_row, img_col, img_chan))
 orig_masks = np.zeros((num_imgs, img_row, img_col,1))
 
-#读取数据
 for idx,img_name in enumerate(img_list): 
     try:
         orig_data[idx] = plt.imread(os.path.join(train_dir, img_name))
@@ -93,8 +90,10 @@ gt_train = [gt1,gt2,gt3,gt4]
 
 model = newmodels.attn_wnet(sgd, input_size, losses.maven_loss)
 hist = model.fit(imgs_train, gt_train, validation_split=0.15,
-                 shuffle=True, epochs=epochnum, batch_size=batchnum,
-                 verbose=True, callbacks=[checkpoint])#, callbacks=[estop,tb])
+                 shuffle=True,
+                 epochs=epochnum, batch_size=batchnum,
+                 verbose=True,
+                 callbacks=[checkpoint])#, callbacks=[estop,tb])
 h = hist.history
 utils.plot(h, epochnum, batchnum, img_col, 1)
 

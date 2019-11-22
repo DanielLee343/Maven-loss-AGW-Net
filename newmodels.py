@@ -228,7 +228,7 @@ def attn_reg_ds(opt,input_size, lossfxn):
     return model
 
 
-#model with improved attention u-net with multi-scale input pyramid and deep supervision
+#model proposed in my paper - improved attention u-net with multi-scale input pyramid and deep supervision
 
 def attn_reg(opt,input_size, lossfxn):
     
