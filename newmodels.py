@@ -1,9 +1,5 @@
 # -*- coding: utf-8 -*-
-"""
-Created on Tue Oct  9 18:54:57 2018
 
-@author: Nabila Abraham
-"""
 import cv2 
 import time
 import os
@@ -167,7 +163,7 @@ def attn_unet(opt,input_size, lossfxn):
     return model
 
 
-#regular attention unet with  deep supervision - exactly from paper (my intepretation)
+#regular attention unet with  deep supervision
 def attn_reg_ds(opt,input_size, lossfxn):
   
     img_input = Input(shape=input_size, name='input_scale1')
@@ -228,8 +224,7 @@ def attn_reg_ds(opt,input_size, lossfxn):
     return model
 
 
-#model proposed in my paper - improved attention u-net with multi-scale input pyramid and deep supervision
-
+#improved attention u-net with multi-scale input pyramid and deep supervision
 def attn_reg(opt,input_size, lossfxn):
     
     img_input = Input(shape=input_size, name='input_scale1')
@@ -296,43 +291,38 @@ def attn_reg(opt,input_size, lossfxn):
                   metrics=[losses.dsc])
     return model
 
-#model proposed in my paper - improved attention w-net with deep supervision and self-reinforced skip connections
+#model proposed in my paper: AGW-net with deep supervision and self-reinforced skip connections
 def attn_wnet(opt,input_size, lossfxn):
+    #first half
     img_input = Input(shape=input_size, name='input_scale1')
     scale_img_2 = AveragePooling2D(pool_size=(2, 2), name='input_scale2')(img_input)
     scale_img_3 = AveragePooling2D(pool_size=(2, 2), name='input_scale3')(scale_img_2)
     scale_img_4 = AveragePooling2D(pool_size=(2, 2), name='input_scale4')(scale_img_3)
 
-    print("first half")
     conv1 = UnetConv2D(img_input, 64, is_batchnorm=True, name='conv1_1')
     conv1 = UnetConv2D(conv1, 64, is_batchnorm=True, name='conv1')
-    print("conv1 is",conv1.shape)  
     pool1 = MaxPooling2D(pool_size=(2, 2))(conv1)
     
     input2 = Conv2D(128, (3, 3), padding='same', activation='relu', name='conv_scale2')(scale_img_2)
     input2 = concatenate([input2, pool1], axis=3)
     conv2 = UnetConv2D(input2, 128, is_batchnorm=True, name='conv2_1')
     conv2 = UnetConv2D(conv2, 128, is_batchnorm=True, name='conv2')
-    print("conv2 is",conv2.shape)
     pool2 = MaxPooling2D(pool_size=(2, 2))(conv2)
     
     input3 = Conv2D(256, (3, 3), padding='same', activation='relu', name='conv_scale3')(scale_img_3)
     input3 = concatenate([input3, pool2], axis=3)
     conv3 = UnetConv2D(input3, 256, is_batchnorm=True, name='conv3_1')
     conv3 = UnetConv2D(conv3, 256, is_batchnorm=True, name='conv3')
-    print("conv3 is",conv3.shape)
     pool3 = MaxPooling2D(pool_size=(2, 2))(conv3)
     
     input4 = Conv2D(512, (3, 3), padding='same', activation='relu', name='conv_scale4')(scale_img_4)
     input4 = concatenate([input4, pool3], axis=3)
     conv4 = UnetConv2D(input4, 512, is_batchnorm=True, name='conv4_1')
     conv4 = UnetConv2D(conv4, 512, is_batchnorm=True, name='conv4')
-    print("conv4 is",conv4.shape)
     pool4 = MaxPooling2D(pool_size=(2, 2))(conv4)
         
     center1 = UnetConv2D(pool4, 512, is_batchnorm=True, name='center1_1')
     center1 = UnetConv2D(center1, 512, is_batchnorm=True, name='center1')
-    print("center1 is", center1.shape,"\n\n\n")
     
     g1 = UnetGatingSignal(center1, is_batchnorm=True, name='g1')
     attn1 = AttnGatingBlock(conv4, g1, 128, '_1')
@@ -355,51 +345,42 @@ def attn_wnet(opt,input_size, lossfxn):
     up4 = concatenate([Conv2DTranspose(32, (3,3), strides=(2,2), padding='same', activation='relu', kernel_initializer=kinit)(up3), conv1], name='up4_temp')
     up4 = UnetConv2D(up4, 32, is_batchnorm=True, name='up4')     
     
-    #second round
-    print("second half:")
+    #second half
     conv8 = UnetConv2D(up4, 32, is_batchnorm=True, name='conv8')
     pool5 = MaxPooling2D(pool_size=(2, 2))(conv8)
-    print("pool5 is", pool5.shape) 
     
     input5 = concatenate([conv7, pool5], axis=3)
     conv9 = UnetConv2D(input5, 64, is_batchnorm=True, name='conv9_1')
     conv9 = UnetConv2D(conv9, 64, is_batchnorm=True, name='conv9')
     pool6 = MaxPooling2D(pool_size=(2, 2))(conv9)
-    print("pool6 is", pool6.shape) 
     
     input6 = concatenate([conv6, pool6], axis=3)
     conv10 = UnetConv2D(input6, 128, is_batchnorm=True, name='conv10_1')
     conv10 = UnetConv2D(conv10, 128, is_batchnorm=True, name='conv10')
     pool7 = MaxPooling2D(pool_size=(2, 2))(conv10)
-    print("pool7 is", pool7.shape)  
 
     input7 = concatenate([conv5, pool7], axis=3)
     conv11 = UnetConv2D(input7, 256, is_batchnorm=True, name='conv11_1')	
     conv11 = UnetConv2D(conv11, 256, is_batchnorm=True, name='conv11')
     pool8 = MaxPooling2D(pool_size=(2, 2))(conv11)
-    print("pool8 is", pool8.shape)  
     
     center2 = UnetConv2D(pool8, 512, is_batchnorm=True, name='center2_1')
     center2 = UnetConv2D(center2, 512, is_batchnorm=True, name='center2')
-    print("center2 is", center2.shape,"\n\n\n")  
     
     g4 = UnetGatingSignal(center2, is_batchnorm=True, name='g4')
     attn4 = AttnGatingBlock(conv11, g4, 128, '_4')
     up5 = concatenate([Conv2DTranspose(64, (3,3), strides=(2,2), padding='same', activation='relu', kernel_initializer=kinit)(center2), attn4], name='up5_temp')
     up5 = UnetConv2D(up5, 256, is_batchnorm=True, name='up5')
-    print("up5 is",up5.shape)
     
     g5 = UnetGatingSignal(up5, is_batchnorm=True, name='g5')
     attn5 = AttnGatingBlock(conv10, g5, 64, '_5')
     up6 = concatenate([Conv2DTranspose(64, (3,3), strides=(2,2), padding='same', activation='relu', kernel_initializer=kinit)(up5), attn5], name='up6_temp')
     up6 = UnetConv2D(up6, 128, is_batchnorm=True, name='up6')
-    print("up6 is",up6.shape)
 
     g6 = UnetGatingSignal(up6, is_batchnorm=True, name='g6')
     attn6 = AttnGatingBlock(conv9, g6, 32, '_6')
     up7 = concatenate([Conv2DTranspose(32, (3,3), strides=(2,2), padding='same', activation='relu', kernel_initializer=kinit)(up6), attn6], name='up7_temp')
     up7 = UnetConv2D(up7, 64, is_batchnorm=True, name='up7')
-    print("up7 is",up7.shape)
     
     up8 = concatenate([Conv2DTranspose(32, (3,3), strides=(2,2), padding='same', activation='relu', kernel_initializer=kinit)(up7), conv8], name='up8_temp')
     up8 = UnetConv2D(up8, 32, is_batchnorm=True, name='up8')

@@ -1,9 +1,5 @@
 # -*- coding: utf-8 -*-
-"""
-Created on Sun Oct 14 17:16:54 2018
 
-@author: Nabila Abraham
-"""
 
 import os 
 import cv2 
