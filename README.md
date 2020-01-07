@@ -1,4 +1,4 @@
-# Maven loss with Improved Attention W-Net
+# Maven loss with AGW-Net
 
 This repo contains the code of our paper **Maven Loss with Improved Attention W-Net for Biomedical Image Segmentation**.
 
