@@ -1,6 +1,6 @@
 # Maven loss with AGW-Net
 
-This repo contains the code of our paper **Maven Loss with Improved Attention W-Net for Biomedical Image Segmentation**.
+This repo contains the code of our paper **Maven Loss with AGW-Net for Biomedical Image Segmentation**.
 
 We introduce (1) a novel loss function named ‘Maven Loss’ by taking ‘specificity’ into consideration to handle the issue of data disequilibrium and to help achieve weighing both abilities of correctly-segmented lesion and non-lesion areas and (2) an improved attention W-Net for better performance.
 
